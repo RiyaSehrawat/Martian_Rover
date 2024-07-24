@@ -70,6 +70,8 @@
                         this.grid[column][row] = new Node(column, row, this.nodeSize, isStart, isFinish, false, this.grid);
                     }
                 }
+
+                console.log("Grid created:", this.grid);
             }
 
             drawGrid() {
@@ -85,16 +87,20 @@
                 const changeX = Math.floor(mouse.x / this.nodeSize);
                 const changeY = Math.floor(mouse.y / this.nodeSize);
 
-                if (this.grid[changeX][changeY].isStart) {
-                    this.grid[changeX][changeY].isStart = false;
-                    this.grid[mouse.x][mouse.y].isStart = true;
-                } else if (this.grid[changeX][changeY].isFinish) {
-                    this.grid[changeX][changeY].isFinish = false;
-                    this.grid[mouse.x][mouse.y].isFinish = true;
-                } else if (mouse.x !== changeX || mouse.y !== changeY) {
-                    this.grid[changeX][changeY].clicked();
+                if (this.grid[changeX] && this.grid[changeX][changeY]) {
+                    if (this.grid[changeX][changeY].isStart) {
+                        this.grid[changeX][changeY].isStart = false;
+                        this.grid[mouse.x][mouse.y].isStart = true;
+                    } else if (this.grid[changeX][changeY].isFinish) {
+                        this.grid[changeX][changeY].isFinish = false;
+                        this.grid[mouse.x][mouse.y].isFinish = true;
+                    } else if (mouse.x !== changeX || mouse.y !== changeY) {
+                        this.grid[changeX][changeY].clicked();
+                    }
+                    this.drawGrid();
+                } else {
+                    console.warn("Invalid mouse coordinates:", changeX, changeY);
                 }
-                this.drawGrid();
             }
 
             getStartNode() {
@@ -139,13 +145,13 @@
         const ctx = canvas.getContext('2d');
         const grid = new Grid(20, 20, 40);
 
+        const mouse = { down: false, x: 0, y: 0 };
+
         canvas.addEventListener('mousedown', (event) => {
             const rect = canvas.getBoundingClientRect();
-            const mouse = {
-                x: event.clientX - rect.left,
-                y: event.clientY - rect.top,
-                down: true
-            };
+            mouse.x = event.clientX - rect.left;
+            mouse.y = event.clientY - rect.top;
+            mouse.down = true;
             grid.updateGrid(mouse);
         });
 
@@ -153,13 +159,14 @@
             mouse.down = false;
         });
 
-        grid.createGrid();
-        grid.drawGrid();
+        window.addEventListener('load', () => {
+            grid.createGrid();
+            grid.drawGrid();
+            console.log("Grid drawn");
+        });
     </script>
 </body>
 </html>
 
-    }
-}
 
 // Ensure `ctx`, `canvas`, `mouse`, `changeX`, `changeY`, and `Node` are properly defined and initialized
